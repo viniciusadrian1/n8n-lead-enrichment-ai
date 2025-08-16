@@ -1,0 +1,182 @@
+{
+  "name": "My workflow 12",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "REMOVED",
+      "name": "Webhook - New Lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        80,
+        352
+      ],
+      "webhookId": "REMOVED"
+    },
+    {
+      "parameters": {
+        "text": "=Name: {{ $json.name }}\nEmail: {{ $json.email }}\nCompany: {{ $json.company }}",
+        "options": {
+          "systemMessage": "Você é um assistente de automação que recebe dados brutos de leads. Enriqueça com cargo provável, tamanho da empresa e segmento. Retorne em JSON estruturado."
+        }
+      },
+      "id": "REMOVED",
+      "name": "AI Lead Enrichment",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        464,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "id": "REMOVED",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        288,
+        560
+      ],
+      "credentials": {
+        "REDACTED": {
+          "id": "REMOVED",
+          "name": "REMOVED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create"
+      },
+      "id": "REMOVED",
+      "name": "CRM - HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2,
+      "position": [
+        880,
+        352
+      ],
+      "credentials": {
+        "REDACTED": {
+          "id": "REMOVED",
+          "name": "REMOVED"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "REMOVED",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook - New Lead').item.json.body.email }}",
+        "subject": "Novo Lead Capturado",
+        "emailType": "text",
+        "message": "=Novo lead capturado! Nome: {{ $('Webhook - New Lead').item.json.body.name }} Email: {{ $('Webhook - New Lead').item.json.body.email }} Empresa: {{ $('Webhook - New Lead').item.json.body.company }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        352
+      ],
+      "id": "REMOVED",
+      "name": "Send a message",
+      "webhookId": "REMOVED",
+      "credentials": {
+        "REDACTED": {
+          "id": "REMOVED",
+          "name": "REMOVED"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - New Lead": {
+      "main": [
+        [
+          {
+            "node": "AI Lead Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Lead Enrichment": {
+      "main": [
+        [
+          {
+            "node": "CRM - HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM - HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Lead Enrichment",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "REMOVED",
+  "meta": {
+    "info": "sanitized"
+  },
+  "id": "REMOVED",
+  "tags": []
+}
